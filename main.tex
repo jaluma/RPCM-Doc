@@ -1,150 +1,213 @@
-% This is samplepaper.tex, a sample chapter demonstrating the
-% LLNCS macro package for Springer Computer Science proceedings;
 % Version 2.20 of 2017/10/04
 %
 \documentclass[runningheads]{llncs}
+
 %
 \usepackage{graphicx}
+\usepackage{hyperref, xcolor}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{amssymb}
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
 %
 % If you use the hyperref package, please uncomment the following line
 % to display URLs in blue roman font according to Springer's eBook style:
-% \renewcommand\UrlFont{\color{blue}\rmfamily}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\pagestyle{plain}
 
 \begin{document}
 %
-\title{Puesta práctica de algoritmos metahuristicos\thanks{Supported by organization x.}}
+\title{Estudio práctico de un algoritmo genético básico sobre el problema de la mochila}
 %
-%\titlerunning{Abbreviated paper title}
+\titlerunning{Problema de la mochila 0-1 \textit{Knapsack}}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
-Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
-Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+\author{Javier Martínez Álvarez}
 %
-\authorrunning{F. Author et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-\institute{Princeton University, Princeton NJ 08544, USA \and
-Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
-\email{lncs@springer.com}\\
-\url{http://www.springer.com/gp/computer-science/lncs} \and
-ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
-\email{\{abc,lncs\}@uni-heidelberg.de}}
+\institute{Master Universitario en Investigación en Inteligencia Artificial\\
+    Universidad Internacional Menendez Pelayo\\
+	\email{100006269@alumnos.uimp.es}}
 %
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-The abstract should briefly summarize the contents of the paper in
-15--250 words.
+    La importancia de los operadores de mutación y cruce en un algoritmo evolutivo (EA)
+    es muy crucial para la búsqueda de la solución óptima. En este estudio se ha
+    evaluado la importancia de los operadores de mutación y cruce en un algoritmo. Partiendo de 
+    una implementación de un algoritmo genético de estado estacionario ya desarrrollado \cite{ref_ssga}, 
+    se ha implementado la función \textit{fitness} correspondiente al problema de la Mochila 0-1.
+    Usando las instancias
 
-\keywords{First keyword  \and Second keyword \and Another keyword.}
+	\keywords{algoritmos \and metahurísticos \and genetico \and mochila \and ssga}
 \end{abstract}
 %
 %
 %
-\section{First Section}
-\subsection{A Subsection Sample}
-Please note that the first paragraph of a section or subsection is
-not indented. The first paragraph that follows a table, figure,
-equation etc. does not need an indent, either.
-
-Subsequent paragraphs, however, are indented.
-
-\subsubsection{Sample Heading (Third Level)} Only two levels of
-headings should be numbered. Lower level headings remain unnumbered;
-they are formatted as run-in headings.
-
-\paragraph{Sample Heading (Fourth Level)}
-The contribution should contain no more than four levels of
-headings. Table~\ref{tab1} gives a summary of all heading levels.
-
-\begin{table}
-\caption{Table captions should be placed above the
-tables.}\label{tab1}
-\begin{tabular}{|l|l|l|}
-\hline
-Heading level &  Example & Font size and style\\
-\hline
-Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
-1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
-2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
-3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
-4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
-\hline
-\end{tabular}
-\end{table}
-
-
-\noindent Displayed equations are centered and set on a separate
-line.
+\section{Introdución}
+\subsection{Problema de la mochila}
+El problema de la mochila es un problema de optimización combinatoria, en el que se desea
+encontrar una solución óptima para una mochila de capacidad que contiene un conjunto de
+objetos, cada uno de los cuales tiene un peso.\\
+Inicialmente, la mochila se encuentra vacía, y se desea maximizar el beneficio obtenido
+en la selección de los objetos. La solución al problema será la suma de los beneficios de los objetos
+que se incluyan en la mochila.
+Por tanto, podríamos definir matemáticamente el problema de la mochila como:
 \begin{equation}
-x + y = z
+    \max_{x \in {0, 1}} \sum_{j=1}^n p_j \cdot x_j
 \end{equation}
-Please try to avoid rasterized images for line-art diagrams and
-schemas. Whenever possible, use vector graphics instead (see
-Fig.~\ref{fig1}).
+\begin{equation}
+    \ni {x \in {0, 1}} \sum_{j=1}^n \sum_{i=1}^m r(i,j) \cdot x_j <= b(i)
+\end{equation}
+Donde $n$ es es el número de objetos que se incluyen en la mochila, $m$ es el número de mochilas, $x_j$ es el valor del gen, 
+$p_j$ es el beneficio que aporta el objeto, $r(i,j)$ es el peso del objeto y $b_i$ es el peso máximo de la mochila.
 
-\begin{figure}
-% \includegraphics[width=\textwidth]{fig1.eps}
-\caption{A figure caption is always placed below the illustration.
-Please note that short captions are centered, while long ones are
-justified by the macro package automatically.} \label{fig1}
-\end{figure}
+\subsection{Algoritmos genéticos}
+El problema de la mochila se puede resolver mediante un algoritmo genético.
+Este algoritmo consiste en una población de individuos, cada uno de los cuales es una solución
+parcial de la mochila. Se evalúa la aptitud de cada individuo mediante la función de fitness.
 
-\begin{theorem}
-This is a sample theorem. The run-in heading is set in bold, while
-the following text appears in italics. Definitions, lemmas,
-propositions, and corollaries are styled the same way.
-\end{theorem}
-%
-% the environments 'definition', 'lemma', 'proposition', 'corollary',
-% 'remark', and 'example' are defined in the LLNCS documentclass as well.
-%
-\begin{proof}
-Proofs, examples, and remarks have the initial word in italics,
-while the following text appears in normal font.
-\end{proof}
-For citations of references, we prefer the use of square brackets
-and consecutive numbers. Citations using labels or the author/year
-convention are also acceptable. The following bibliography provides
-a sample reference list with entries for journal
-articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
-book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
-and a homepage~\cite{ref_url1}. Multiple citations are grouped
-\cite{ref_article1,ref_lncs1,ref_book1},
-\cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
-%
+\subsection{Operadores de cruce}
+Los operadores de cruce consisten en unir dos individuos, mediante el cruce, para formar un
+nuevo individuo. En nuestro estudio, se hará uso del operador de recombinación \textit{Single Point Crossover} \cite{ref_spx} (SPX).
+Este consiste en copiar una serie de genes de un individuo padre en un individuo hijo,
+y otra serie de genes de otro individuo padre en otro individuo hijo.
+La partición se determina generando un número aleario y determinando si es inferior a la probabilidad de cruce.
+En caso afirmativo, realizará el cruce y generará el nuevo individuo. En caso contrario, se devolverá uno de los individuos padres.
+
+\subsection{Operadores de mutación}
+Los operadores de mutación consisten en modificar un individuo modificando uno de sus genes heredados de alguno de sus padres.
+A partir de una probabilidad de mutación dada por el usuario, se determina si se realizará la mutación y se intercambiará el valor de uno de los genes
+por el contrario (torneo binario).
+
+\subsection{Algoritmo genético \textit{Steady State} (ssGA)}
+ssGA es una implementación de un algoritmo genético de estado estacionario. Con los siguientes pasos de forma iterativa:
+
+\begin{enumerate}
+    \item Se genera una población inicial de individuos.
+    \item Se evalúa el \textit{fitness} de cada individuo de la población.
+    \item Se seleccionan dos individuos haciendo uso de un \textbf{torneo binario} (\cite{ref_tournament}).
+    \item Usando el operador de cruce \textbf{SPX} (\cite{ref_spx}), se genera un nuevo individuo.
+    \item Al nuevo individuo, se le aplica el operador de mutación binaria.
+    \item Evaluar el \textit{fitness} del nuevo individuo.
+    \item Se reemplaza el nuevo individuo en la población por el individuo que obtuvo el menor valor de \textit{fitness}.
+\end{enumerate}
+
+\section{Estudio experimental}
+
+Para realizar el sigueinte estudio experimental, se ha usado las instancias para el problema de la mochila
+que se pueden encontrar en la siguiente \cite{ref_or_library}. Se ha definido un programa que nos permite leer
+la instancia y ejecutar el algoritmo genético para todas los problemas de la instancia. Estos problemas fueron
+definidos en el siguiente \cite{ref_balas}. 
+
+\subsection{Ejemplo de una solución óptima}
+
+\subsection{Estudio en la busqueda del óptimo}
+
+\subsection{Estudio en la detención de la convergencia}
+
+\section{Conclusiones}
+
+% \subsubsection{Sample Heading (Third Level)} Only two levels of
+% headings should be numbered. Lower level headings remain unnumbered;
+% they are formatted as run-in headings.
+
+% \paragraph{Sample Heading (Fourth Level)}
+% The contribution should contain no more than four levels of
+% headings. Table~\ref{tab1} gives a summary of all heading levels.
+
+% \begin{table}
+% \caption{Table captions should be placed above the
+% tables.}\label{tab1}
+% \begin{tabular}{|l|l|l|}
+% \hline
+% Heading level &  Example & Font size and style\\
+% \hline
+% Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
+% 1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
+% 2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
+% 3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
+% 4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
+% \hline
+% \end{tabular}
+% \end{table}
+
+
+% \noindent Displayed equations are centered and set on a separate
+% line.
+% \begin{equation}
+% x + y = z
+% \end{equation}
+% Please try to avoid rasterized images for line-art diagrams and
+% schemas. Whenever possible, use vector graphics instead (see
+% Fig.~\ref{fig1}).
+
+% \begin{figure}
+% % \includegraphics[width=\textwidth]{fig1.eps}
+% \caption{A figure caption is always placed below the illustration.
+% Please note that short captions are centered, while long ones are
+% justified by the macro package automatically.} \label{fig1}
+% \end{figure}
+
+% \begin{theorem}
+% This is a sample theorem. The run-in heading is set in bold, while
+% the following text appears in italics. Definitions, lemmas,
+% propositions, and corollaries are styled the same way.
+% \end{theorem}
+% %
+% % the environments 'definition', 'lemma', 'proposition', 'corollary',
+% % 'remark', and 'example' are defined in the LLNCS documentclass as well.
+% %
+% \begin{proof}
+% Proofs, examples, and remarks have the initial word in italics,
+% while the following text appears in normal font.
+% \end{proof}
+% For citations of references, we prefer the use of square brackets
+% and consecutive numbers. Citations using labels or the author/year
+% convention are also acceptable. The following bibliography provides
+% a sample reference list with entries for journal
+% articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
+% book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
+% and a homepage~\cite{ref_url1}. Multiple citations are grouped
+% \cite{ref_article1,ref_lncs1,ref_book1},
+% \cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
+
+
 % ---- Bibliography ----
 %
 % BibTeX users should specify bibliography style 'splncs04'.
 % References will then be sorted and formatted in the correct style.
 %
-% \bibliographystyle{splncs04}
-% \bibliography{mybibliography}
+\bibliographystyle{splncs04}
+\bibliography{mybibliography}
 %
 \begin{thebibliography}{8}
-\bibitem{ref_article1}
-Author, F.: Article title. Journal \textbf{2}(5), 99--110 (2016)
+    \bibitem{ref_ssga}
+	Author, E., Author: Steady State Genetic Algorithm (ssGA),
+	(1999). \url{https://neo.lcc.uma.es/software/ssga/index.php}
 
-\bibitem{ref_lncs1}
-Author, F., Author, S.: Title of a proceedings paper. In: Editor,
-F., Editor, S. (eds.) CONFERENCE 2016, LNCS, vol. 9999, pp. 1--13.
-Springer, Heidelberg (2016). \doi{10.10007/1234567890}
+    \bibitem{ref_spx}
+	Author, T., Author, S., Author, M.: Theoretical Analysis of Simplex Crossover for Real-Coded Genetic Algorithms,
+	France (2000). \url{http://www.springer.com/engineering/computational-systems-control/theoretical-analysis-of-simplex-crossover-for-real-coded-genetic-algorithms}
 
-\bibitem{ref_book1}
-Author, F., Author, S., Author, T.: Book title. 2nd edn. Publisher,
-Location (1999)
+    \bibitem{ref_tournament}
+	Tournament selection,
+	(2021). \url{https://en.wikipedia.org/wiki/Tournament_selection}
 
-\bibitem{ref_proc1}
-Author, A.-B.: Contribution title. In: 9th International Proceedings
-on Proceedings, pp. 1--2. Publisher, Location (2010)
+    \bibitem{ref_balas}
+	Author, C. C. :Computational experience with variants of the Balas algorithm applied to the selection of R\&D projects,
+	(1967). \url{https://en.wikipedia.org/wiki/Tournament_selection}
 
-\bibitem{ref_url1}
-LNCS Homepage, \url{http://www.springer.com/lncs}. Last accessed 4
-Oct 2017
+    \bibitem{ref_or_library}
+	Author, J., Author: OR Library,
+	\url{http://people.brunel.ac.uk/~mastjjb/jeb/orlib/mknapinfo.html}
+
+
 \end{thebibliography}
+
 \end{document}
